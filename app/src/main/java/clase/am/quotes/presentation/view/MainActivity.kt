@@ -10,8 +10,41 @@ import clase.am.quotes.R
 import kotlinx.coroutines.launch
 import clase.am.quotes.databinding.ActivityMainBinding
 import clase.am.quotes.presentation.viewmodel.QuoteViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 class MainActivity : AppCompatActivity() {
+    @AndroidEntryPoint
+    class MainActivity : AppCompatActivity() {
+
+        private lateinit var binding: ActivityMainBinding
+        private val quoteViewModel: QuoteViewModel by viewModels()
+
+
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+
+            binding = ActivityMainBinding.inflate(layoutInflater)
+            setContentView(binding.root)
+
+            //----------------------------
+            quoteViewModel.randomQuote()
+            observer()
+            binding.viewContainer.setOnClickListener {
+                quoteViewModel.randomQuote()
+            }
+
+        }
+        private fun observer(){
+            lifecycleScope.launch {
+                quoteViewModel.quoteModel.collect {
+                    binding.tvQuote.text = it.quote
+                    binding.tvAuthor.text= it.author
+                }
+            }
+        }
+
+
+    }
 
         private lateinit var binding: ActivityMainBinding
         private val quoteViewModel: QuoteViewModel by viewModels()
